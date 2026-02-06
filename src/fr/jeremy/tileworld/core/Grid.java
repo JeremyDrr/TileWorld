@@ -11,7 +11,7 @@ public class Grid {
         this.width = width;
         this.height = height;
         this.matrix = new TileType[height][width];
-        // Initialisation par défaut
+        //Init by default
         for (TileType[] row : matrix) {
             Arrays.fill(row, TileType.EMPTY);
         }

@@ -1,5 +1,6 @@
 package fr.jeremy.tileworld;
 
+import fr.jeremy.tileworld.agents.AStarAgent;
 import fr.jeremy.tileworld.agents.IAgent;
 import fr.jeremy.tileworld.agents.RandomAgent;
 import fr.jeremy.tileworld.core.Direction;
@@ -11,43 +12,49 @@ public class Main {
 
         //System.out.println("Hello TileWorld!");
 
-        Grid world = new Grid(10, 10);
-        IAgent agent = new RandomAgent();
+        int width = 20;
+        int height = 10;
+        int targetX = 18;
+        int targetY = 8;
+        int agentX = 1;
+        int agentY = 1;
 
-        //HARDCODED (For now.)
-        int agentX = 1, agentY = 1;
-        int targetX = 8, targetY = 8;
+        Grid world = new Grid(width, height);
+        IAgent agent = new AStarAgent(targetX, targetY);
+
+        //We add U-shaped walls, to test the intelligence of the Agent
+        for (int i = 5; i < 15; i++) world.setTile(i, 3, TileType.OBSTACLE); // Roof
+        for (int i = 3; i < 7; i++) world.setTile(5, i, TileType.OBSTACLE);  // Left Wall
+        for (int i = 3; i < 7; i++) world.setTile(14, i, TileType.OBSTACLE); // Right Wall
 
         world.setTile(targetX, targetY, TileType.TARGET);
-        world.setTile(5, 5, TileType.OBSTACLE);
 
-        for (int step = 0; step < 100; step++) {
-            // Nettoyage console (marche sur la plupart des terminaux modernes)
+        while (true) {
+            //Clear console
             System.out.print("\033[H\033[2J");
             System.out.flush();
 
-            // Placement de l'agent sur la grille
             world.setTile(agentX, agentY, TileType.AGENT);
-
-            System.out.println("Étape : " + step + " | Position : (" + agentX + "," + agentY + ")");
             world.display();
 
             if (agentX == targetX && agentY == targetY) {
-                System.out.println("Cible atteinte ! 🎉");
+                System.out.println("\nCible atteinte ! L'agent a trouvé le chemin optimal. 🏆");
                 break;
             }
 
-            // Décision de l'agent
+            //Computing the next move
             Direction move = agent.chooseAction(world, agentX, agentY);
 
-            // On efface l'ancienne position pour le prochain tour
-            world.setTile(agentX, agentY, TileType.EMPTY);
+            if (move == Direction.STAY) {
+                System.out.println("\nL'agent est bloqué... Impossible d'atteindre la cible.");
+                break;
+            }
 
-            // Mise à jour de la position
+            world.setTile(agentX, agentY, TileType.EMPTY);
             agentX += move.dx;
             agentY += move.dy;
 
-            Thread.sleep(300); // Pause pour avoir le temps de voir
+            Thread.sleep(150);
         }
     }
 }
