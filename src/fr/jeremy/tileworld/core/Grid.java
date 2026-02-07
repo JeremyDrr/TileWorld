@@ -45,4 +45,8 @@ public class Grid {
             System.out.println();
         }
     }
+
+    public TileType getTile(int x, int y) {
+        return matrix[y][x];
+    }
 }
